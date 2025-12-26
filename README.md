@@ -2,21 +2,6 @@
 
 A multi-tenant Employee microservice built with the Kratos framework, providing REST API for employee management with JWT authentication and complete tenant isolation.
 
-## Features
-
-- ✅ Multi-tenant architecture with complete data isolation
-- ✅ JWT-based authentication with tenant_id extraction
-- ✅ RESTful API for employee CRUD operations
-- ✅ Pagination and date-based filtering
-- ✅ Employee merge functionality
-- ✅ PostgreSQL with GORM and UUIDs
-- ✅ Email uniqueness per tenant
-- ✅ Comprehensive error handling
-- ✅ Input validation (proto-level and business logic)
-- ✅ NATS event publishing for employee lifecycle events
-- ✅ Database migrations with golang-migrate
-- ✅ Docker Compose setup
-
 ## Quick Start
 
 ### Prerequisites
@@ -77,18 +62,6 @@ make migrate-up
 # Run service
 go run ./cmd/employee-service -conf ./configs
 ```
-
-## Documentation
-
-- **[IMPLEMENTATION.md](IMPLEMENTATION.md)** - Complete implementation guide, API documentation, and architecture details
-- **[EVENTS.md](EVENTS.md)** - NATS event publishing documentation and consumer examples
-- **[VALIDATION.md](VALIDATION.md)** - Input validation rules and testing
-- **[PROTOVALIDATE_MIGRATION.md](PROTOVALIDATE_MIGRATION.md)** - Migration to buf.build/protovalidate
-- **[UUID_MIGRATION.md](UUID_MIGRATION.md)** - UUID implementation details
-- **[DOCKER.md](DOCKER.md)** - Docker and Docker Compose guide
-- **[scripts/README.md](scripts/README.md)** - Testing scripts and utilities
-- **[migrations/README.md](migrations/README.md)** - Database migration guide
-
 ## API Endpoints
 
 All endpoints require JWT authentication with `sub` and `tenant_id` claims:
@@ -121,34 +94,6 @@ make consumer
 ## Configuration
 
 Edit `configs/config.yaml` for server and database settings. JWT secret is read from `JWT_SECRET` environment variable.
-
-## Project Structure
-
-```
-employee-service/
-├── api/employee/v1/          # Proto definitions
-├── cmd/employee-service/      # Main application
-├── internal/
-│   ├── biz/                  # Business logic
-│   ├── data/                 # Data access layer
-│   ├── server/               # Server & middleware
-│   └── service/              # Service layer
-├── configs/                  # Configuration files
-└── scripts/                  # Testing utilities
-```
-
-## Development
-
-```bash
-# Generate proto files
-make api
-
-# Generate wire dependencies
-make generate
-
-# Build
-make build
-```
 
 ## Sharing Proto Definitions with Other Projects
 
@@ -201,17 +146,6 @@ Releases are automated via GitHub Actions and produce both Docker images and Go 
 4. Enter the version following semantic versioning (e.g., `v1.0.0`, `v1.2.3`)
 5. Select the branch to release from
 6. Click **Run workflow**
-
-#### What Happens During Release:
-
-1. ✅ Version format validation
-2. 🔄 Updates `Version` variable in `cmd/employee-service/main.go`
-3. 📝 Commits the version change
-4. 🏷️ Creates a Git tag
-5. 🐳 Builds Docker image with version tag
-6. 📤 Pushes to GitHub Container Registry (GHCR)
-7. 📋 Creates GitHub Release with changelog
-8. 🎯 Tags both Docker image and Go module with the same version
 
 #### Release Outputs:
 
