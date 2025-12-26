@@ -70,20 +70,25 @@ service EmployeeService {
 // Employee message - tenant_id is NOT exposed, it's managed internally
 message Employee {
   string id = 1;  // UUID v4 as string
-  string email = 2;
-  repeated string secondary_emails = 3;
-  string first_name = 4;
-  string last_name = 5;
-  google.protobuf.Timestamp created_at = 6;
-  google.protobuf.Timestamp updated_at = 7;
+  repeated string emails = 2;  // All email addresses for this employee
+  string first_name = 3;
+  string last_name = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
 }
 
 // Create Employee
 message CreateEmployeeRequest {
-  string email = 1 [(buf.validate.field).string = {
-    email: true,
-    min_len: 3,
-    max_len: 255
+  repeated string emails = 1 [(buf.validate.field).repeated = {
+    min_items: 1,
+    max_items: 10,
+    items: {
+      string: {
+        email: true,
+        min_len: 3,
+        max_len: 255
+      }
+    }
   }];
   
   string first_name = 2 [(buf.validate.field).string = {
@@ -108,10 +113,15 @@ message UpdateEmployeeRequest {
   string id = 1 [(buf.validate.field).string.uuid = true];
   
   // Optional fields - only validated if set
-  optional string email = 2 [(buf.validate.field).string = {
-    email: true,
-    min_len: 3,
-    max_len: 255
+  repeated string emails = 2 [(buf.validate.field).repeated = {
+    max_items: 10,
+    items: {
+      string: {
+        email: true,
+        min_len: 3,
+        max_len: 255
+      }
+    }
   }];
   
   optional string first_name = 3 [(buf.validate.field).string = {

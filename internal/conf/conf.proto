@@ -9,6 +9,7 @@ message Bootstrap {
   Server server = 1;
   Data data = 2;
   Auth auth = 3;
+  Observability observability = 4;
 }
 
 message Server {
@@ -41,4 +42,29 @@ message Data {
 
 message Auth {
   string jwt_secret = 1;
+}
+
+message Observability {
+  Metrics metrics = 1;
+  Tracing tracing = 2;
+  Logging logging = 3;
+}
+
+message Metrics {
+  bool enabled = 1;
+  string namespace = 2;
+  string subsystem = 3;
+}
+
+message Tracing {
+  bool enabled = 1;
+  string endpoint = 2;
+  double sample_rate = 3;
+  bool insecure = 4;
+}
+
+message Logging {
+  bool enabled = 1;
+  bool log_requests = 2;
+  bool log_responses = 3;
 }

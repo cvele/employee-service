@@ -5,9 +5,11 @@ import (
 	"os"
 
 	"employee-service/internal/conf"
+	"employee-service/internal/observability"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
+	"github.com/go-kratos/kratos/v2/config/env"
 	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
@@ -20,9 +22,9 @@ import (
 // go build -ldflags "-X main.Version=x.y.z"
 var (
 	// Name is the name of the compiled software.
-	Name string
+	Name = "employee-service"
 	// Version is the version of the compiled software.
-	Version string
+	Version = "v1.0.0"
 	// flagconf is the config flag.
 	flagconf string
 
@@ -30,15 +32,18 @@ var (
 )
 
 func init() {
-	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+	flag.StringVar(&flagconf, "conf", "../../configs/config.yaml", "config path, eg: -conf ./configs/config.yaml")
 }
+
 
 func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 	return kratos.New(
 		kratos.ID(id),
 		kratos.Name(Name),
 		kratos.Version(Version),
-		kratos.Metadata(map[string]string{}),
+		kratos.Metadata(map[string]string{
+			"env": os.Getenv("ENVIRONMENT"),
+		}),
 		kratos.Logger(logger),
 		kratos.Server(
 			gs,
@@ -61,6 +66,7 @@ func main() {
 	c := config.New(
 		config.WithSource(
 			file.NewSource(flagconf),
+			env.NewSource(), // Loads env vars - file's ${VAR:default} will resolve to these
 		),
 	)
 	defer c.Close()
@@ -74,7 +80,15 @@ func main() {
 		panic(err)
 	}
 
-	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Auth, logger)
+	app, cleanup, err := wireApp(
+		bc.Server,
+		bc.Data,
+		bc.Auth,
+		bc.Observability,
+		observability.ServiceName(Name),
+		observability.ServiceVersion(Version),
+		logger,
+	)
 	if err != nil {
 		panic(err)
 	}

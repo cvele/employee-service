@@ -28,14 +28,13 @@ var (
 
 // Employee is an Employee domain model.
 type Employee struct {
-	ID              uuid.UUID
-	TenantID        string
-	Email           string
-	SecondaryEmails []string
-	FirstName       string
-	LastName        string
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	ID        uuid.UUID
+	TenantID  string
+	Emails    []string
+	FirstName string
+	LastName  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // ListFilter represents filtering options for listing employees
@@ -94,15 +93,22 @@ func (uc *EmployeeUsecase) CreateEmployee(ctx context.Context, employee *Employe
 		return nil, err
 	}
 
-	uc.log.WithContext(ctx).Infof("CreateEmployee: tenant=%s, email=%s", tenantID, employee.Email)
-
-	// Check if email already exists in this tenant
-	exists, err := uc.repo.CheckEmailExists(ctx, tenantID, employee.Email)
-	if err != nil {
-		return nil, err
+	// Validate at least one email is provided
+	if len(employee.Emails) == 0 {
+		return nil, ErrInvalidEmail
 	}
-	if exists {
-		return nil, ErrEmployeeAlreadyExists
+
+	uc.log.WithContext(ctx).Infof("CreateEmployee: tenant=%s, emails=%v", tenantID, employee.Emails)
+
+	// Check if any email already exists in this tenant
+	for _, email := range employee.Emails {
+		exists, err := uc.repo.CheckEmailExists(ctx, tenantID, email)
+		if err != nil {
+			return nil, err
+		}
+		if exists {
+			return nil, ErrEmployeeAlreadyExists
+		}
 	}
 
 	// Set tenant ID
@@ -142,22 +148,37 @@ func (uc *EmployeeUsecase) UpdateEmployee(ctx context.Context, employee *Employe
 		return nil, ErrEmployeeNotFound
 	}
 
-	// If email is being changed, check uniqueness
-	if employee.Email != "" && employee.Email != existing.Email {
-		exists, err := uc.repo.CheckEmailExists(ctx, tenantID, employee.Email)
-		if err != nil {
-			return nil, err
-		}
-		if exists {
-			return nil, ErrEmployeeAlreadyExists
-		}
-	}
-
 	// Track which fields are being updated
 	updatedFields := []string{}
-	if employee.Email != "" && employee.Email != existing.Email {
-		updatedFields = append(updatedFields, "email")
+	
+	// Check if emails are being updated
+	if len(employee.Emails) > 0 {
+		// Check uniqueness for any new emails
+		for _, email := range employee.Emails {
+			// Skip if email already belongs to this employee
+			alreadyOwned := false
+			for _, existingEmail := range existing.Emails {
+				if email == existingEmail {
+					alreadyOwned = true
+					break
+				}
+			}
+			if alreadyOwned {
+				continue
+			}
+
+			// Check if email exists for another employee
+			exists, err := uc.repo.CheckEmailExists(ctx, tenantID, email)
+			if err != nil {
+				return nil, err
+			}
+			if exists {
+				return nil, ErrEmployeeAlreadyExists
+			}
+		}
+		updatedFields = append(updatedFields, "emails")
 	}
+
 	if employee.FirstName != "" && employee.FirstName != existing.FirstName {
 		updatedFields = append(updatedFields, "first_name")
 	}
@@ -289,7 +310,7 @@ func (uc *EmployeeUsecase) ListEmployees(ctx context.Context, filter *ListFilter
 }
 
 // MergeEmployees merges two employees by email within tenant.
-// The primary email becomes the main employee, secondary email is added to secondary_emails.
+// All emails from the secondary employee are transferred to the primary employee.
 func (uc *EmployeeUsecase) MergeEmployees(ctx context.Context, primaryEmail string, secondaryEmail string) (*Employee, error) {
 	tenantID, err := GetTenantID(ctx)
 	if err != nil {

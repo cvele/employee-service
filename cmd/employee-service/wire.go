@@ -9,6 +9,7 @@ import (
 	"employee-service/internal/biz"
 	"employee-service/internal/conf"
 	"employee-service/internal/data"
+	"employee-service/internal/observability"
 	"employee-service/internal/server"
 	"employee-service/internal/service"
 
@@ -18,6 +19,22 @@ import (
 )
 
 // wireApp init kratos application.
-func wireApp(*conf.Server, *conf.Data, *conf.Auth, log.Logger) (*kratos.App, func(), error) {
-	panic(wire.Build(server.ProviderSet, data.ProviderSet, biz.ProviderSet, service.ProviderSet, newApp))
+func wireApp(
+	serverConf *conf.Server,
+	dataConf *conf.Data,
+	authConf *conf.Auth,
+	obsConf *conf.Observability,
+	serviceName observability.ServiceName,
+	version observability.ServiceVersion,
+	logger log.Logger,
+) (*kratos.App, func(), error) {
+	panic(wire.Build(
+		server.ProviderSet,
+		data.ProviderSet,
+		biz.ProviderSet,
+		service.ProviderSet,
+		observability.ProviderSet,
+		observability.NewServiceInfo,
+		newApp,
+	))
 }

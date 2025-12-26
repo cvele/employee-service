@@ -22,42 +22,36 @@ services:
     networks:
       - employee-network
 
-  # Uncomment to run the service in Docker
-  # employee-service:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   container_name: employee-service-app
-  #   environment:
-  #     JWT_SECRET: ${JWT_SECRET:-dev-secret-key-change-in-production}
-  #   ports:
-  #     - "8000:8000"  # HTTP
-  #     - "9000:9000"  # gRPC
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #   volumes:
-  #     - ./configs:/data/conf:ro
-  #   networks:
-  #     - employee-network
-  #   command: ["/app/employee-service", "-conf", "/data/conf"]
-
-  # Optional: pgAdmin for database management
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: employee-service-pgadmin
+  employee-service:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: employee-service
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      # Variables that match ${VAR:default} placeholders in config.yaml
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-key-change-in-production}
+      HTTP_PORT: 8000
+      GRPC_PORT: 9000
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: employee_service
+      POSTGRES_PORT: 5432
+      POSTGRES_SSLMODE: disable
+      NATS_URL: nats://nats:4222
+      OTEL_EXPORTER_OTLP_ENDPOINT: otel-collector:4317
     ports:
-      - "${PGADMIN_PORT:-5050}:80"
+      - "${HTTP_PORT:-8000}:8000"
+      - "${GRPC_PORT:-9000}:9000"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./configs:/data/conf:ro
     networks:
       - employee-network
-    profiles:
-      - tools  # Only start with: docker-compose --profile tools up
+    command: ["/app/employee-service", "-conf", "/data/conf/config.yaml"]
 
 volumes:
   postgres_data:

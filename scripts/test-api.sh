@@ -40,7 +40,7 @@ EMPLOYEE_A=$(curl -s -X POST "$BASE_URL/api/v1/employees" \
   -H "Authorization: Bearer $TOKEN_TENANT_A" \
   -H "Content-Type: application/json" \
   -d "{
-    \"email\": \"$TEST_EMAIL_A\",
+    \"emails\": [\"$TEST_EMAIL_A\"],
     \"first_name\": \"Alice\",
     \"last_name\": \"Smith\"
   }")
@@ -60,7 +60,7 @@ EMPLOYEE_B=$(curl -s -X POST "$BASE_URL/api/v1/employees" \
   -H "Authorization: Bearer $TOKEN_TENANT_B" \
   -H "Content-Type: application/json" \
   -d "{
-    \"email\": \"$TEST_EMAIL_B\",
+    \"emails\": [\"$TEST_EMAIL_B\"],
     \"first_name\": \"Bob\",
     \"last_name\": \"Jones\"
   }")
@@ -106,7 +106,7 @@ DUPLICATE=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$BASE_URL/api/v1/empl
   -H "Authorization: Bearer $TOKEN_TENANT_A" \
   -H "Content-Type: application/json" \
   -d "{
-    \"email\": \"$TEST_EMAIL_A\",
+    \"emails\": [\"$TEST_EMAIL_A\"],
     \"first_name\": \"Alice2\",
     \"last_name\": \"Smith2\"
   }")
@@ -126,7 +126,7 @@ SAME_EMAIL=$(curl -s -X POST "$BASE_URL/api/v1/employees" \
   -H "Authorization: Bearer $TOKEN_TENANT_B" \
   -H "Content-Type: application/json" \
   -d "{
-    \"email\": \"$TEST_EMAIL_A\",
+    \"emails\": [\"$TEST_EMAIL_A\"],
     \"first_name\": \"Alice\",
     \"last_name\": \"Brown-TenantB\"
   }")
@@ -155,7 +155,7 @@ if [ -n "$EMPLOYEE_A_ID" ]; then
       -H "Content-Type: application/json" \
       -d "{
         \"id\": \"$EMPLOYEE_A_ID\",
-        \"email\": \"$UPDATED_EMAIL\",
+        \"emails\": [\"$UPDATED_EMAIL\"],
         \"first_name\": \"Alice\",
         \"last_name\": \"Smith-Updated\"
       }" | jq .
@@ -209,7 +209,7 @@ INVALID_EMAIL=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$BASE_URL/api/v1/
   -H "Authorization: Bearer $TOKEN_TENANT_A" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "not-an-email",
+    "emails": ["not-an-email"],
     "first_name": "Test",
     "last_name": "User"
   }')
@@ -229,7 +229,7 @@ EMPTY_NAME=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$BASE_URL/api/v1/emp
   -H "Authorization: Bearer $TOKEN_TENANT_A" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "test@example.com",
+    "emails": ["test@example.com"],
     "first_name": "",
     "last_name": ""
   }')
@@ -249,7 +249,7 @@ SHORT_EMAIL=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$BASE_URL/api/v1/em
   -H "Authorization: Bearer $TOKEN_TENANT_A" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "a@",
+    "emails": ["a@"],
     "first_name": "Test",
     "last_name": "User"
   }')
@@ -269,7 +269,7 @@ INVALID_NAME=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$BASE_URL/api/v1/e
   -H "Authorization: Bearer $TOKEN_TENANT_A" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "test@example.com",
+    "emails": ["test@example.com"],
     "first_name": "Test123",
     "last_name": "User@#$"
   }')
@@ -289,7 +289,7 @@ LONG_NAME=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$BASE_URL/api/v1/empl
   -H "Authorization: Bearer $TOKEN_TENANT_A" \
   -H "Content-Type: application/json" \
   -d "{
-    \"email\": \"test@example.com\",
+    \"emails\": [\"test@example.com\"],
     \"first_name\": \"$(printf 'A%.0s' {1..101})\",
     \"last_name\": \"User\"
   }")
@@ -361,7 +361,7 @@ VALID_NAME=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$BASE_URL/api/v1/emp
   -H "Authorization: Bearer $TOKEN_TENANT_A" \
   -H "Content-Type: application/json" \
   -d "{
-    \"email\": \"mary-jane-${TIMESTAMP}@example.com\",
+    \"emails\": [\"mary-jane-${TIMESTAMP}@example.com\"],
     \"first_name\": \"Mary-Jane\",
     \"last_name\": \"O'Brien-Smith\"
   }")

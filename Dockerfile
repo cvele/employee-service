@@ -1,17 +1,15 @@
-FROM golang:1.19 AS builder
+FROM golang:1.24-alpine AS builder
+
+RUN apk add --no-cache make git
 
 COPY . /src
 WORKDIR /src
 
-RUN GOPROXY=https://goproxy.cn make build
+RUN make build
 
-FROM debian:stable-slim
+FROM alpine:latest
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-		ca-certificates  \
-        netbase \
-        && rm -rf /var/lib/apt/lists/ \
-        && apt-get autoremove -y && apt-get autoclean -y
+RUN apk --no-cache add ca-certificates tzdata
 
 COPY --from=builder /src/bin /app
 
@@ -19,6 +17,5 @@ WORKDIR /app
 
 EXPOSE 8000
 EXPOSE 9000
-VOLUME /data/conf
 
-CMD ["./server", "-conf", "/data/conf"]
+CMD ["./employee-service", "-conf", "/data/conf/config.yaml"]

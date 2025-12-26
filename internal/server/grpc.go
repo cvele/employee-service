@@ -3,17 +3,25 @@ package server
 import (
 	employee "employee-service/api/employee/v1"
 	"employee-service/internal/conf"
+	"employee-service/internal/observability"
 	"employee-service/internal/server/middleware"
 	"employee-service/internal/service"
 	"os"
 
 	"github.com/go-kratos/kratos/v2/log"
+	kratosMiddleware "github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, auth *conf.Auth, employeeSvc *service.EmployeeService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(
+	c *conf.Server,
+	auth *conf.Auth,
+	obs *observability.Observability,
+	employeeSvc *service.EmployeeService,
+	logger log.Logger,
+) *grpc.Server {
 	// Get JWT secret from environment variable or config
 	jwtSecret := auth.JwtSecret
 	if jwtSecret == "" {
@@ -23,13 +31,24 @@ func NewGRPCServer(c *conf.Server, auth *conf.Auth, employeeSvc *service.Employe
 		log.Fatal("JWT_SECRET is not configured")
 	}
 
-	var opts = []grpc.ServerOption{
-		grpc.Middleware(
-			recovery.Recovery(),
-			middleware.ProtoValidate(), // Protovalidate middleware wrapper
-			middleware.JWTAuth(jwtSecret),
-		),
+	// Build middleware chain
+	middlewares := []kratosMiddleware.Middleware{
+		recovery.Recovery(),
 	}
+	
+	// Add observability middleware (tracing, logging, metrics)
+	middlewares = append(middlewares, obs.ServerMiddleware()...)
+	
+	// Add business middleware
+	middlewares = append(middlewares,
+		middleware.ProtoValidate(),
+		middleware.JWTAuth(jwtSecret),
+	)
+
+	var opts = []grpc.ServerOption{
+		grpc.Middleware(middlewares...),
+	}
+	
 	if c.Grpc.Network != "" {
 		opts = append(opts, grpc.Network(c.Grpc.Network))
 	}
@@ -39,7 +58,9 @@ func NewGRPCServer(c *conf.Server, auth *conf.Auth, employeeSvc *service.Employe
 	if c.Grpc.Timeout != nil {
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
+	
 	srv := grpc.NewServer(opts...)
 	employee.RegisterEmployeeServiceServer(srv, employeeSvc)
+	
 	return srv
 }

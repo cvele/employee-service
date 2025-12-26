@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"employee-service/internal/biz"
 	eventsv1 "employee-service/api/events/v1"
+	"employee-service/internal/biz"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -26,26 +26,24 @@ func TestToProtoEmployeeData(t *testing.T) {
 		{
 			name: "valid employee",
 			employee: &biz.Employee{
-				ID:              uuid.New(),
-				Email:           "test@example.com",
-				SecondaryEmails: []string{"secondary@example.com"},
-				FirstName:       "John",
-				LastName:        "Doe",
-				CreatedAt:       time.Now(),
-				UpdatedAt:       time.Now(),
+				ID:        uuid.New(),
+				Emails:    []string{"test@example.com", "secondary@example.com"},
+				FirstName: "John",
+				LastName:  "Doe",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			},
 			wantNil: false,
 		},
 		{
-			name: "employee with nil secondary emails",
+			name: "employee with nil emails",
 			employee: &biz.Employee{
-				ID:              uuid.New(),
-				Email:           "test@example.com",
-				SecondaryEmails: nil,
-				FirstName:       "Jane",
-				LastName:        "Smith",
-				CreatedAt:       time.Now(),
-				UpdatedAt:       time.Now(),
+				ID:        uuid.New(),
+				Emails:    nil,
+				FirstName: "Jane",
+				LastName:  "Smith",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			},
 			wantNil: false,
 		},
@@ -54,7 +52,7 @@ func TestToProtoEmployeeData(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := toProtoEmployeeData(tt.employee)
-			
+
 			if tt.wantNil {
 				assert.Nil(t, result)
 				return
@@ -62,17 +60,16 @@ func TestToProtoEmployeeData(t *testing.T) {
 
 			assert.NotNil(t, result)
 			assert.Equal(t, tt.employee.ID.String(), result.Id)
-			assert.Equal(t, tt.employee.Email, result.Email)
 			assert.Equal(t, tt.employee.FirstName, result.FirstName)
 			assert.Equal(t, tt.employee.LastName, result.LastName)
-			
+
 			// Should have empty array, not nil
-			assert.NotNil(t, result.SecondaryEmails)
-			
-			if tt.employee.SecondaryEmails != nil {
-				assert.Equal(t, tt.employee.SecondaryEmails, result.SecondaryEmails)
+			assert.NotNil(t, result.Emails)
+
+			if tt.employee.Emails != nil {
+				assert.Equal(t, tt.employee.Emails, result.Emails)
 			} else {
-				assert.Empty(t, result.SecondaryEmails)
+				assert.Empty(t, result.Emails)
 			}
 		})
 	}
@@ -81,13 +78,12 @@ func TestToProtoEmployeeData(t *testing.T) {
 func TestEmployeeCreatedEventContract(t *testing.T) {
 	// Test that EmployeeCreatedEvent can be marshaled and unmarshaled
 	employee := &biz.Employee{
-		ID:              uuid.New(),
-		Email:           "test@example.com",
-		SecondaryEmails: []string{},
-		FirstName:       "John",
-		LastName:        "Doe",
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		ID:        uuid.New(),
+		Emails:    []string{"test@example.com"},
+		FirstName: "John",
+		LastName:  "Doe",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	event := &eventsv1.EmployeeCreatedEvent{
@@ -117,18 +113,17 @@ func TestEmployeeCreatedEventContract(t *testing.T) {
 	assert.Equal(t, event.Event.TenantId, decoded.Event.TenantId)
 	assert.Equal(t, event.Event.UserId, decoded.Event.UserId)
 	assert.Equal(t, event.Event.Employee.Id, decoded.Event.Employee.Id)
-	assert.Equal(t, event.Event.Employee.Email, decoded.Event.Employee.Email)
+	assert.Equal(t, event.Event.Employee.Emails, decoded.Event.Employee.Emails)
 }
 
 func TestEmployeeUpdatedEventContract(t *testing.T) {
 	employee := &biz.Employee{
-		ID:              uuid.New(),
-		Email:           "updated@example.com",
-		SecondaryEmails: []string{},
-		FirstName:       "Jane",
-		LastName:        "Updated",
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		ID:        uuid.New(),
+		Emails:    []string{"updated@example.com"},
+		FirstName: "Jane",
+		LastName:  "Updated",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	event := &eventsv1.EmployeeUpdatedEvent{
@@ -158,13 +153,12 @@ func TestEmployeeUpdatedEventContract(t *testing.T) {
 
 func TestEmployeeDeletedEventContract(t *testing.T) {
 	employee := &biz.Employee{
-		ID:              uuid.New(),
-		Email:           "deleted@example.com",
-		SecondaryEmails: []string{},
-		FirstName:       "Deleted",
-		LastName:        "User",
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		ID:        uuid.New(),
+		Emails:    []string{"deleted@example.com"},
+		FirstName: "Deleted",
+		LastName:  "User",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	event := &eventsv1.EmployeeDeletedEvent{
@@ -193,13 +187,12 @@ func TestEmployeeDeletedEventContract(t *testing.T) {
 
 func TestEmployeeMergedEventContract(t *testing.T) {
 	employee := &biz.Employee{
-		ID:              uuid.New(),
-		Email:           "primary@example.com",
-		SecondaryEmails: []string{"merged@example.com"},
-		FirstName:       "Merged",
-		LastName:        "Employee",
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		ID:        uuid.New(),
+		Emails:    []string{"primary@example.com", "merged@example.com"},
+		FirstName: "Merged",
+		LastName:  "Employee",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	event := &eventsv1.EmployeeMergedEvent{
@@ -259,4 +252,3 @@ func TestSubjectConstants(t *testing.T) {
 	assert.Equal(t, "employees.v1.deleted", SubjectEmployeeDeleted)
 	assert.Equal(t, "employees.v1.merged", SubjectEmployeeMerged)
 }
-

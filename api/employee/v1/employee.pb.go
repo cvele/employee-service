@@ -26,16 +26,15 @@ const (
 
 // Employee message - tenant_id is NOT exposed, it's managed internally
 type Employee struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // UUID v4 as string
-	Email           string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	SecondaryEmails []string               `protobuf:"bytes,3,rep,name=secondary_emails,json=secondaryEmails,proto3" json:"secondary_emails,omitempty"`
-	FirstName       string                 `protobuf:"bytes,4,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
-	LastName        string                 `protobuf:"bytes,5,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
-	CreatedAt       *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt       *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`         // UUID v4 as string
+	Emails        []string               `protobuf:"bytes,2,rep,name=emails,proto3" json:"emails,omitempty"` // All email addresses for this employee
+	FirstName     string                 `protobuf:"bytes,3,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName      string                 `protobuf:"bytes,4,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Employee) Reset() {
@@ -75,16 +74,9 @@ func (x *Employee) GetId() string {
 	return ""
 }
 
-func (x *Employee) GetEmail() string {
+func (x *Employee) GetEmails() []string {
 	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
-func (x *Employee) GetSecondaryEmails() []string {
-	if x != nil {
-		return x.SecondaryEmails
+		return x.Emails
 	}
 	return nil
 }
@@ -120,7 +112,7 @@ func (x *Employee) GetUpdatedAt() *timestamppb.Timestamp {
 // Create Employee
 type CreateEmployeeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Emails        []string               `protobuf:"bytes,1,rep,name=emails,proto3" json:"emails,omitempty"`
 	FirstName     string                 `protobuf:"bytes,2,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
 	LastName      string                 `protobuf:"bytes,3,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -157,11 +149,11 @@ func (*CreateEmployeeRequest) Descriptor() ([]byte, []int) {
 	return file_employee_v1_employee_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CreateEmployeeRequest) GetEmail() string {
+func (x *CreateEmployeeRequest) GetEmails() []string {
 	if x != nil {
-		return x.Email
+		return x.Emails
 	}
-	return ""
+	return nil
 }
 
 func (x *CreateEmployeeRequest) GetFirstName() string {
@@ -227,9 +219,9 @@ type UpdateEmployeeRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Optional fields - only validated if set
-	Email         *string `protobuf:"bytes,2,opt,name=email,proto3,oneof" json:"email,omitempty"`
-	FirstName     *string `protobuf:"bytes,3,opt,name=first_name,json=firstName,proto3,oneof" json:"first_name,omitempty"`
-	LastName      *string `protobuf:"bytes,4,opt,name=last_name,json=lastName,proto3,oneof" json:"last_name,omitempty"`
+	Emails        []string `protobuf:"bytes,2,rep,name=emails,proto3" json:"emails,omitempty"`
+	FirstName     *string  `protobuf:"bytes,3,opt,name=first_name,json=firstName,proto3,oneof" json:"first_name,omitempty"`
+	LastName      *string  `protobuf:"bytes,4,opt,name=last_name,json=lastName,proto3,oneof" json:"last_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -271,11 +263,11 @@ func (x *UpdateEmployeeRequest) GetId() string {
 	return ""
 }
 
-func (x *UpdateEmployeeRequest) GetEmail() string {
-	if x != nil && x.Email != nil {
-		return *x.Email
+func (x *UpdateEmployeeRequest) GetEmails() []string {
+	if x != nil {
+		return x.Emails
 	}
-	return ""
+	return nil
 }
 
 func (x *UpdateEmployeeRequest) GetFirstName() string {
@@ -843,32 +835,32 @@ var File_employee_v1_employee_proto protoreflect.FileDescriptor
 
 const file_employee_v1_employee_proto_rawDesc = "" +
 	"\n" +
-	"\x1aemployee/v1/employee.proto\x12\vemployee.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bbuf/validate/validate.proto\"\x8d\x02\n" +
+	"\x1aemployee/v1/employee.proto\x12\vemployee.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bbuf/validate/validate.proto\"\xe4\x01\n" +
 	"\bEmployee\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12)\n" +
-	"\x10secondary_emails\x18\x03 \x03(\tR\x0fsecondaryEmails\x12\x1d\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
+	"\x06emails\x18\x02 \x03(\tR\x06emails\x12\x1d\n" +
 	"\n" +
-	"first_name\x18\x04 \x01(\tR\tfirstName\x12\x1b\n" +
-	"\tlast_name\x18\x05 \x01(\tR\blastName\x129\n" +
+	"first_name\x18\x03 \x01(\tR\tfirstName\x12\x1b\n" +
+	"\tlast_name\x18\x04 \x01(\tR\blastName\x129\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xb1\x01\n" +
-	"\x15CreateEmployeeRequest\x12\"\n" +
-	"\x05email\x18\x01 \x01(\tB\f\xbaH\tr\a\x10\x03\x18\xff\x01`\x01R\x05email\x12:\n" +
+	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xbc\x01\n" +
+	"\x15CreateEmployeeRequest\x12-\n" +
+	"\x06emails\x18\x01 \x03(\tB\x15\xbaH\x12\x92\x01\x0f\b\x01\x10\n" +
+	"\"\tr\a\x10\x03\x18\xff\x01`\x01R\x06emails\x12:\n" +
 	"\n" +
 	"first_name\x18\x02 \x01(\tB\x1b\xbaH\x18r\x16\x10\x01\x18d2\x10^[a-zA-Z\\s\\-']+$R\tfirstName\x128\n" +
 	"\tlast_name\x18\x03 \x01(\tB\x1b\xbaH\x18r\x16\x10\x01\x18d2\x10^[a-zA-Z\\s\\-']+$R\blastName\"K\n" +
 	"\x16CreateEmployeeResponse\x121\n" +
-	"\bemployee\x18\x01 \x01(\v2\x15.employee.v1.EmployeeR\bemployee\"\x81\x02\n" +
+	"\bemployee\x18\x01 \x01(\v2\x15.employee.v1.EmployeeR\bemployee\"\xfb\x01\n" +
 	"\x15UpdateEmployeeRequest\x12\x18\n" +
-	"\x02id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\x02id\x12'\n" +
-	"\x05email\x18\x02 \x01(\tB\f\xbaH\tr\a\x10\x03\x18\xff\x01`\x01H\x00R\x05email\x88\x01\x01\x12?\n" +
+	"\x02id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\x02id\x12+\n" +
+	"\x06emails\x18\x02 \x03(\tB\x13\xbaH\x10\x92\x01\r\x10\n" +
+	"\"\tr\a\x10\x03\x18\xff\x01`\x01R\x06emails\x12?\n" +
 	"\n" +
-	"first_name\x18\x03 \x01(\tB\x1b\xbaH\x18r\x16\x10\x01\x18d2\x10^[a-zA-Z\\s\\-']+$H\x01R\tfirstName\x88\x01\x01\x12=\n" +
-	"\tlast_name\x18\x04 \x01(\tB\x1b\xbaH\x18r\x16\x10\x01\x18d2\x10^[a-zA-Z\\s\\-']+$H\x02R\blastName\x88\x01\x01B\b\n" +
-	"\x06_emailB\r\n" +
+	"first_name\x18\x03 \x01(\tB\x1b\xbaH\x18r\x16\x10\x01\x18d2\x10^[a-zA-Z\\s\\-']+$H\x00R\tfirstName\x88\x01\x01\x12=\n" +
+	"\tlast_name\x18\x04 \x01(\tB\x1b\xbaH\x18r\x16\x10\x01\x18d2\x10^[a-zA-Z\\s\\-']+$H\x01R\blastName\x88\x01\x01B\r\n" +
 	"\v_first_nameB\f\n" +
 	"\n" +
 	"_last_name\"K\n" +

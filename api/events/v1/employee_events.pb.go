@@ -183,18 +183,16 @@ type EmployeeData struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Employee ID (UUID v4)
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Primary email address
-	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	// Secondary email addresses (from merges)
-	SecondaryEmails []string `protobuf:"bytes,3,rep,name=secondary_emails,json=secondaryEmails,proto3" json:"secondary_emails,omitempty"`
+	// All email addresses for this employee
+	Emails []string `protobuf:"bytes,2,rep,name=emails,proto3" json:"emails,omitempty"`
 	// First name
-	FirstName string `protobuf:"bytes,4,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	FirstName string `protobuf:"bytes,3,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
 	// Last name
-	LastName string `protobuf:"bytes,5,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	LastName string `protobuf:"bytes,4,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
 	// When the employee was created
-	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	// When the employee was last updated
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -236,16 +234,9 @@ func (x *EmployeeData) GetId() string {
 	return ""
 }
 
-func (x *EmployeeData) GetEmail() string {
+func (x *EmployeeData) GetEmails() []string {
 	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
-func (x *EmployeeData) GetSecondaryEmails() []string {
-	if x != nil {
-		return x.SecondaryEmails
+		return x.Emails
 	}
 	return nil
 }
@@ -492,18 +483,17 @@ const file_events_v1_employee_events_proto_rawDesc = "" +
 	"\bmetadata\x18\a \x03(\v2&.events.v1.EmployeeEvent.MetadataEntryR\bmetadata\x1a;\n" +
 	"\rMetadataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x91\x02\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe8\x01\n" +
 	"\fEmployeeData\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12)\n" +
-	"\x10secondary_emails\x18\x03 \x03(\tR\x0fsecondaryEmails\x12\x1d\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
+	"\x06emails\x18\x02 \x03(\tR\x06emails\x12\x1d\n" +
 	"\n" +
-	"first_name\x18\x04 \x01(\tR\tfirstName\x12\x1b\n" +
-	"\tlast_name\x18\x05 \x01(\tR\blastName\x129\n" +
+	"first_name\x18\x03 \x01(\tR\tfirstName\x12\x1b\n" +
+	"\tlast_name\x18\x04 \x01(\tR\blastName\x129\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"F\n" +
+	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"F\n" +
 	"\x14EmployeeCreatedEvent\x12.\n" +
 	"\x05event\x18\x01 \x01(\v2\x18.events.v1.EmployeeEventR\x05event\"m\n" +
 	"\x14EmployeeUpdatedEvent\x12.\n" +

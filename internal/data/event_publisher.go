@@ -3,8 +3,8 @@ package data
 import (
 	"context"
 
-	"employee-service/internal/biz"
 	eventsv1 "employee-service/api/events/v1"
+	"employee-service/internal/biz"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
@@ -42,17 +42,16 @@ func toProtoEmployeeData(emp *biz.Employee) *eventsv1.EmployeeData {
 		return nil
 	}
 
-	secondaryEmails := emp.SecondaryEmails
-	if secondaryEmails == nil {
-		secondaryEmails = []string{}
+	emails := emp.Emails
+	if emails == nil {
+		emails = []string{}
 	}
 
 	return &eventsv1.EmployeeData{
-		Id:              emp.ID.String(),
-		Email:           emp.Email,
-		SecondaryEmails: secondaryEmails,
-		FirstName:       emp.FirstName,
-		LastName:        emp.LastName,
+		Id:        emp.ID.String(),
+		Emails:    emails,
+		FirstName: emp.FirstName,
+		LastName:  emp.LastName,
 		CreatedAt:       timestamppb.New(emp.CreatedAt),
 		UpdatedAt:       timestamppb.New(emp.UpdatedAt),
 	}

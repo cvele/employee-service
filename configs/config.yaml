@@ -1,10 +1,10 @@
 server:
   http:
     addr: 0.0.0.0:${HTTP_PORT:8000}
-    timeout: 1s
+    timeout: 30s
   grpc:
     addr: 0.0.0.0:${GRPC_PORT:9000}
-    timeout: 1s
+    timeout: 30s
 data:
   database:
     driver: postgres
@@ -14,3 +14,17 @@ data:
     # Using versioned subjects: employees.v1.{created,updated,deleted,merged}
 auth:
   jwt_secret: ${JWT_SECRET}
+observability:
+  metrics:
+    enabled: true
+    namespace: employee_service
+    subsystem: server
+  tracing:
+    enabled: true
+    endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:localhost:4317}
+    sample_rate: 1.0
+    insecure: true
+  logging:
+    enabled: true
+    log_requests: true
+    log_responses: false

@@ -29,26 +29,25 @@ func toProtoEmployee(e *biz.Employee) *v1.Employee {
 		return nil
 	}
 
-	secondaryEmails := e.SecondaryEmails
-	if secondaryEmails == nil {
-		secondaryEmails = []string{}
+	emails := e.Emails
+	if emails == nil {
+		emails = []string{}
 	}
 
 	return &v1.Employee{
-		Id:              e.ID.String(),
-		Email:           e.Email,
-		SecondaryEmails: secondaryEmails,
-		FirstName:       e.FirstName,
-		LastName:        e.LastName,
-		CreatedAt:       timestamppb.New(e.CreatedAt),
-		UpdatedAt:       timestamppb.New(e.UpdatedAt),
+		Id:        e.ID.String(),
+		Emails:    emails,
+		FirstName: e.FirstName,
+		LastName:  e.LastName,
+		CreatedAt: timestamppb.New(e.CreatedAt),
+		UpdatedAt: timestamppb.New(e.UpdatedAt),
 	}
 }
 
 // CreateEmployee creates a new employee.
 func (s *EmployeeService) CreateEmployee(ctx context.Context, req *v1.CreateEmployeeRequest) (*v1.CreateEmployeeResponse, error) {
 	employee := &biz.Employee{
-		Email:     req.Email,
+		Emails:    req.Emails,
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
 	}
@@ -75,9 +74,9 @@ func (s *EmployeeService) UpdateEmployee(ctx context.Context, req *v1.UpdateEmpl
 		ID: id,
 	}
 	
-	// Handle optional fields (pointers from proto optional)
-	if req.Email != nil {
-		employee.Email = *req.Email
+	// Handle optional fields
+	if len(req.Emails) > 0 {
+		employee.Emails = req.Emails
 	}
 	if req.FirstName != nil {
 		employee.FirstName = *req.FirstName

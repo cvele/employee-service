@@ -127,11 +127,10 @@ func printEvent(eventType string, event *eventsv1.EmployeeEvent) {
 		log.Println()
 		log.Println("Employee Data:")
 		log.Printf("  ID:         %s", emp.Id)
-		log.Printf("  Email:      %s", emp.Email)
 		log.Printf("  First Name: %s", emp.FirstName)
 		log.Printf("  Last Name:  %s", emp.LastName)
-		if len(emp.SecondaryEmails) > 0 {
-			log.Printf("  Secondary Emails: %v", emp.SecondaryEmails)
+		if len(emp.Emails) > 0 {
+			log.Printf("  Emails: %v", emp.Emails)
 		}
 		log.Printf("  Created At: %s", emp.CreatedAt.AsTime().Format("2006-01-02 15:04:05"))
 		log.Printf("  Updated At: %s", emp.UpdatedAt.AsTime().Format("2006-01-02 15:04:05"))

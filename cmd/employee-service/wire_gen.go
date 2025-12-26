@@ -10,6 +10,7 @@ import (
 	"employee-service/internal/biz"
 	"employee-service/internal/conf"
 	"employee-service/internal/data"
+	"employee-service/internal/observability"
 	"employee-service/internal/server"
 	"employee-service/internal/service"
 	"github.com/go-kratos/kratos/v2"
@@ -23,18 +24,26 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, auth *conf.Auth, logger log.Logger) (*kratos.App, func(), error) {
-	dataData, cleanup, err := data.NewData(confData, logger)
+func wireApp(serverConf *conf.Server, dataConf *conf.Data, authConf *conf.Auth, obsConf *conf.Observability, serviceName observability.ServiceName, version observability.ServiceVersion, logger log.Logger) (*kratos.App, func(), error) {
+	serviceInfo := observability.NewServiceInfo(serviceName, version)
+	observabilityObservability, cleanup, err := observability.NewObservability(obsConf, serviceInfo, logger)
 	if err != nil {
+		return nil, nil, err
+	}
+	dataData, cleanup2, err := data.NewData(dataConf, logger)
+	if err != nil {
+		cleanup()
 		return nil, nil, err
 	}
 	employeeRepo := data.NewEmployeeRepo(dataData, logger)
 	employeeUsecase := biz.NewEmployeeUsecase(employeeRepo, logger)
 	employeeService := service.NewEmployeeService(employeeUsecase)
-	grpcServer := server.NewGRPCServer(confServer, auth, employeeService, logger)
-	httpServer := server.NewHTTPServer(confServer, auth, employeeService, logger)
+	grpcServer := server.NewGRPCServer(serverConf, authConf, observabilityObservability, employeeService, logger)
+	healthChecker := server.ProvideHealthChecker(dataData, logger)
+	httpServer := server.NewHTTPServer(serverConf, authConf, observabilityObservability, employeeService, healthChecker, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
+		cleanup2()
 		cleanup()
 	}, nil
 }

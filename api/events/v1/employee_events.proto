@@ -46,23 +46,20 @@ message EmployeeData {
   // Employee ID (UUID v4)
   string id = 1;
   
-  // Primary email address
-  string email = 2;
-  
-  // Secondary email addresses (from merges)
-  repeated string secondary_emails = 3;
+  // All email addresses for this employee
+  repeated string emails = 2;
   
   // First name
-  string first_name = 4;
+  string first_name = 3;
   
   // Last name
-  string last_name = 5;
+  string last_name = 4;
   
   // When the employee was created
-  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp created_at = 5;
   
   // When the employee was last updated
-  google.protobuf.Timestamp updated_at = 7;
+  google.protobuf.Timestamp updated_at = 6;
 }
 
 // EmployeeCreatedEvent is published when a new employee is created

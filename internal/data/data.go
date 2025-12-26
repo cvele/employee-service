@@ -24,7 +24,7 @@ type Data struct {
 // NewData .
 func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 	logHelper := log.NewHelper(logger)
-	
+
 	// Open database connection
 	db, err := gorm.Open(postgres.Open(c.Database.Source), &gorm.Config{})
 	if err != nil {
@@ -37,7 +37,7 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 	// Connect to NATS (optional)
 	var nc *nats.Conn
 	var publisher *EventPublisher
-	
+
 	if c.Nats != nil && c.Nats.Url != "" {
 		nc, err = nats.Connect(c.Nats.Url,
 			nats.MaxReconnects(-1), // Infinite reconnects
@@ -58,7 +58,7 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 			publisher = NewEventPublisher(nc, "", logger)
 		}
 	} else {
-		logHelper.Info("NATS not configured, events disabled")
+		logHelper.Warn("NATS not configured, events disabled")
 	}
 
 	cleanup := func() {
@@ -66,7 +66,7 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 			nc.Close()
 			logHelper.Info("NATS connection closed")
 		}
-		
+
 		sqlDB, err := db.DB()
 		if err != nil {
 			logHelper.Errorf("failed to get database instance: %v", err)
@@ -77,6 +77,16 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 		}
 		logHelper.Info("closing the data resources")
 	}
-	
+
 	return &Data{db: db, nc: nc, publisher: publisher}, cleanup, nil
+}
+
+// GetDB returns the database connection for health checking
+func (d *Data) GetDB() *gorm.DB {
+	return d.db
+}
+
+// GetNATS returns the NATS connection for health checking
+func (d *Data) GetNATS() *nats.Conn {
+	return d.nc
 }

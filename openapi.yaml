@@ -166,8 +166,10 @@ components:
         employee.v1.CreateEmployeeRequest:
             type: object
             properties:
-                email:
-                    type: string
+                emails:
+                    type: array
+                    items:
+                        type: string
                 firstName:
                     type: string
                 lastName:
@@ -188,9 +190,7 @@ components:
             properties:
                 id:
                     type: string
-                email:
-                    type: string
-                secondaryEmails:
+                emails:
                     type: array
                     items:
                         type: string
@@ -248,8 +248,10 @@ components:
             properties:
                 id:
                     type: string
-                email:
-                    type: string
+                emails:
+                    type: array
+                    items:
+                        type: string
                     description: Optional fields - only validated if set
                 firstName:
                     type: string
