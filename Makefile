@@ -24,6 +24,8 @@ init:
 	go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
 	go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
 	go install github.com/google/wire/cmd/wire@latest
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install golang.org/x/tools/cmd/goimports@latest
 
 .PHONY: config
 # generate internal proto
@@ -56,6 +58,17 @@ events:
 # build
 build:
 	mkdir -p bin/ && go build -ldflags "-X main.Version=$(VERSION)" -o ./bin/ ./...
+
+.PHONY: lint
+# run linter
+lint:
+	golangci-lint run --timeout=5m ./...
+
+.PHONY: format
+# format code
+format:
+	gofmt -s -w .
+	goimports -w .
 
 .PHONY: test
 # run unit tests

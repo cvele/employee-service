@@ -88,11 +88,11 @@ func (h *HealthChecker) LivenessHandler() http.HandlerFunc {
 		if err := h.CheckLiveness(r.Context()); err != nil {
 			h.logger.Errorf("liveness check failed: %v", err)
 			w.WriteHeader(http.StatusServiceUnavailable)
-			w.Write([]byte(fmt.Sprintf("Service not live: %v", err)))
+			_, _ = fmt.Fprintf(w, "Service not live: %v", err)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("OK"))
 	}
 }
 
@@ -102,11 +102,10 @@ func (h *HealthChecker) ReadinessHandler() http.HandlerFunc {
 		if err := h.CheckReadiness(r.Context()); err != nil {
 			h.logger.Warnf("readiness check failed: %v", err)
 			w.WriteHeader(http.StatusServiceUnavailable)
-			w.Write([]byte(fmt.Sprintf("Service not ready: %v", err)))
+			_, _ = fmt.Fprintf(w, "Service not ready: %v", err)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("OK"))
 	}
 }
-

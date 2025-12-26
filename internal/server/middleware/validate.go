@@ -44,4 +44,3 @@ func ProtoValidate() middleware.Middleware {
 		}
 	}
 }
-

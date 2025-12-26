@@ -51,9 +51,8 @@ func main() {
 	fmt.Println("Token Details:")
 	fmt.Printf("  User ID: %s\n", userID)
 	fmt.Printf("  Tenant ID: %s\n", tenantID)
-	fmt.Printf("  Expires: %s\n", claims.ExpiresAt.Time.Format(time.RFC3339))
+	fmt.Printf("  Expires: %s\n", claims.ExpiresAt.Format(time.RFC3339))
 	fmt.Println()
 	fmt.Println("Example Usage:")
 	fmt.Printf("  curl -H \"Authorization: Bearer %s\" http://localhost:8000/api/v1/employees/list\n", tokenString)
 }
-

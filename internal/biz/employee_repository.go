@@ -26,4 +26,3 @@ type EmployeeRepo interface {
 	MergeEmployees(ctx context.Context, tenantID string, primaryEmail string, secondaryEmail string) (*Employee, error)
 	GetEventPublisher() EventPublisher
 }
-

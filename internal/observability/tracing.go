@@ -28,7 +28,7 @@ func NewTracingProvider(serviceName ServiceName, version ServiceVersion, endpoin
 	opts := []otlptracegrpc.Option{
 		otlptracegrpc.WithEndpoint(endpoint),
 	}
-	
+
 	if insecureConn {
 		opts = append(opts, otlptracegrpc.WithInsecure())
 	}
@@ -81,4 +81,3 @@ func (t *TracingProvider) Shutdown(ctx context.Context) error {
 	}
 	return nil
 }
-

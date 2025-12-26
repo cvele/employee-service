@@ -73,7 +73,7 @@ func (s *EmployeeService) UpdateEmployee(ctx context.Context, req *v1.UpdateEmpl
 	employee := &biz.Employee{
 		ID: id,
 	}
-	
+
 	// Handle optional fields
 	if len(req.Emails) > 0 {
 		employee.Emails = req.Emails
@@ -146,7 +146,7 @@ func (s *EmployeeService) GetEmployeeByEmail(ctx context.Context, req *v1.GetEmp
 // ListEmployees lists employees with pagination and filtering.
 func (s *EmployeeService) ListEmployees(ctx context.Context, req *v1.ListEmployeesRequest) (*v1.ListEmployeesResponse, error) {
 	filter := &biz.ListFilter{}
-	
+
 	// Handle optional pagination fields (default to 0, business logic applies defaults)
 	if req.Page != nil {
 		filter.Page = *req.Page
@@ -193,4 +193,3 @@ func (s *EmployeeService) MergeEmployees(ctx context.Context, req *v1.MergeEmplo
 		Employee: toProtoEmployee(employee),
 	}, nil
 }
-

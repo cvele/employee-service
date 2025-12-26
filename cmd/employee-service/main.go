@@ -35,7 +35,6 @@ func init() {
 	flag.StringVar(&flagconf, "conf", "../../configs/config.yaml", "config path, eg: -conf ./configs/config.yaml")
 }
 
-
 func newApp(logger log.Logger, environment string, gs *grpc.Server, hs *http.Server) *kratos.App {
 	return kratos.New(
 		kratos.ID(id),
@@ -54,14 +53,16 @@ func newApp(logger log.Logger, environment string, gs *grpc.Server, hs *http.Ser
 
 func main() {
 	flag.Parse()
-	
+
 	c := config.New(
 		config.WithSource(
 			file.NewSource(flagconf),
 			env.NewSource(), // Loads env vars - file's ${VAR:default} will resolve to these
 		),
 	)
-	defer c.Close()
+	defer func() {
+		_ = c.Close()
+	}()
 
 	if err := c.Load(); err != nil {
 		panic(err)

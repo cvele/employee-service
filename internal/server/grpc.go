@@ -35,10 +35,10 @@ func NewGRPCServer(
 	middlewares := []kratosMiddleware.Middleware{
 		recovery.Recovery(),
 	}
-	
+
 	// Add observability middleware (tracing, logging, metrics)
 	middlewares = append(middlewares, obs.ServerMiddleware()...)
-	
+
 	// Add business middleware
 	middlewares = append(middlewares,
 		middleware.ProtoValidate(),
@@ -48,7 +48,7 @@ func NewGRPCServer(
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(middlewares...),
 	}
-	
+
 	if c.Grpc.Network != "" {
 		opts = append(opts, grpc.Network(c.Grpc.Network))
 	}
@@ -58,9 +58,9 @@ func NewGRPCServer(
 	if c.Grpc.Timeout != nil {
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
-	
+
 	srv := grpc.NewServer(opts...)
 	employee.RegisterEmployeeServiceServer(srv, employeeSvc)
-	
+
 	return srv
 }

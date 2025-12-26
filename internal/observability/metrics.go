@@ -39,4 +39,3 @@ func NewMetricsProvider(namespace, subsystem string) *MetricsProvider {
 func MetricsHandler() http.Handler {
 	return promhttp.Handler()
 }
-

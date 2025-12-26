@@ -52,8 +52,8 @@ func toProtoEmployeeData(emp *biz.Employee) *eventsv1.EmployeeData {
 		Emails:    emails,
 		FirstName: emp.FirstName,
 		LastName:  emp.LastName,
-		CreatedAt:       timestamppb.New(emp.CreatedAt),
-		UpdatedAt:       timestamppb.New(emp.UpdatedAt),
+		CreatedAt: timestamppb.New(emp.CreatedAt),
+		UpdatedAt: timestamppb.New(emp.UpdatedAt),
 	}
 }
 

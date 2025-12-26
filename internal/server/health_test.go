@@ -16,15 +16,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// mockNATSConn is a mock NATS connection for testing
-type mockNATSConn struct {
-	connected bool
-}
-
-func (m *mockNATSConn) IsConnected() bool {
-	return m.connected
-}
-
 // nopLogger is a no-op logger for testing
 type nopLogger struct{}
 
@@ -58,7 +49,7 @@ func setupMockDB(t *testing.T) (*gorm.DB, sqlmock.Sqlmock, func()) {
 	}
 
 	cleanup := func() {
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}
 
 	return db, mock, cleanup
@@ -303,7 +294,6 @@ func TestHealthChecker_ReadinessHandler(t *testing.T) {
 	}
 }
 
-
 func TestNewHealthChecker(t *testing.T) {
 	t.Run("creates health checker with all dependencies", func(t *testing.T) {
 		db, _, cleanup := setupMockDB(t)
@@ -333,4 +323,3 @@ func TestNewHealthChecker(t *testing.T) {
 		assert.NotNil(t, hc.logger)
 	})
 }
-

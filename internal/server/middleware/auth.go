@@ -105,4 +105,3 @@ func parseToken(tokenString string, secret string) (*JWTClaims, error) {
 
 	return nil, fmt.Errorf("invalid token claims")
 }
-

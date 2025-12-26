@@ -36,10 +36,10 @@ func NewServiceInfo(name ServiceName, version ServiceVersion) *ServiceInfo {
 }
 
 type Observability struct {
-	metrics  *MetricsProvider
-	tracing  *TracingProvider
-	logger   log.Logger
-	conf     *conf.Observability
+	metrics *MetricsProvider
+	tracing *TracingProvider
+	logger  log.Logger
+	conf    *conf.Observability
 }
 
 func NewObservability(c *conf.Observability, info *ServiceInfo, logger log.Logger) (*Observability, func(), error) {
@@ -106,4 +106,3 @@ func (o *Observability) ServerMiddleware() []middleware.Middleware {
 
 	return mws
 }
-

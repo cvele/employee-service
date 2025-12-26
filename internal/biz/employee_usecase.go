@@ -297,4 +297,3 @@ func (uc *EmployeeUsecase) MergeEmployees(ctx context.Context, primaryEmail stri
 
 	return merged, nil
 }
-

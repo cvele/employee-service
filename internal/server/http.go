@@ -36,10 +36,10 @@ func NewHTTPServer(
 	middlewares := []kratosMiddleware.Middleware{
 		recovery.Recovery(),
 	}
-	
+
 	// Add observability middleware (tracing, logging, metrics)
 	middlewares = append(middlewares, obs.ServerMiddleware()...)
-	
+
 	// Add business middleware
 	middlewares = append(middlewares,
 		middleware.ProtoValidate(),
@@ -49,7 +49,7 @@ func NewHTTPServer(
 	var opts = []http.ServerOption{
 		http.Middleware(middlewares...),
 	}
-	
+
 	if c.Http.Network != "" {
 		opts = append(opts, http.Network(c.Http.Network))
 	}
@@ -59,18 +59,18 @@ func NewHTTPServer(
 	if c.Http.Timeout != nil {
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
-	
+
 	srv := http.NewServer(opts...)
-	
+
 	// Register service
 	employee.RegisterEmployeeServiceHTTPServer(srv, employeeSvc)
-	
+
 	// Register metrics endpoint (no auth required)
 	srv.Handle("/metrics", observability.MetricsHandler())
-	
+
 	// Register health check endpoints (no auth required)
 	srv.HandleFunc("/health/live", healthChecker.LivenessHandler())
 	srv.HandleFunc("/health/ready", healthChecker.ReadinessHandler())
-	
+
 	return srv
 }

@@ -47,4 +47,3 @@ func WithTenantID(ctx context.Context, tenantID string) context.Context {
 func WithUserID(ctx context.Context, userID string) context.Context {
 	return context.WithValue(ctx, userIDKey, userID)
 }
-

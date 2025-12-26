@@ -41,7 +41,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer db.Close()
+	defer func() {
+		_ = db.Close()
+	}()
 
 	// Verify connection
 	if err := db.Ping(); err != nil {
@@ -127,4 +129,3 @@ func main() {
 		log.Fatalf("Unknown command: %s (available: up, down, force, version, drop)", command)
 	}
 }
-
