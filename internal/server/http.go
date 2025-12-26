@@ -1,11 +1,11 @@
 package server
 
 import (
-	employee "employee-service/api/employee/v1"
-	"employee-service/internal/conf"
-	"employee-service/internal/observability"
-	"employee-service/internal/server/middleware"
-	"employee-service/internal/service"
+	employee "github.com/cvele/employee-service/api/employee/v1"
+	"github.com/cvele/employee-service/internal/conf"
+	"github.com/cvele/employee-service/internal/observability"
+	"github.com/cvele/employee-service/internal/server/middleware"
+	"github.com/cvele/employee-service/internal/service"
 	"os"
 
 	"github.com/go-kratos/kratos/v2/log"

@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	eventsv1 "employee-service/api/events/v1"
-	"employee-service/internal/biz"
+	eventsv1 "github.com/cvele/employee-service/api/events/v1"
+	"github.com/cvele/employee-service/internal/biz"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

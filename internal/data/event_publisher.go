@@ -3,8 +3,8 @@ package data
 import (
 	"context"
 
-	eventsv1 "employee-service/api/events/v1"
-	"employee-service/internal/biz"
+	eventsv1 "github.com/cvele/employee-service/api/events/v1"
+	"github.com/cvele/employee-service/internal/biz"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"

@@ -7,16 +7,17 @@
 package main
 
 import (
-	"employee-service/internal/biz"
-	"employee-service/internal/conf"
-	"employee-service/internal/data"
-	"employee-service/internal/observability"
-	"employee-service/internal/server"
-	"employee-service/internal/service"
-
+	"github.com/cvele/employee-service/internal/biz"
+	"github.com/cvele/employee-service/internal/conf"
+	"github.com/cvele/employee-service/internal/data"
+	"github.com/cvele/employee-service/internal/observability"
+	"github.com/cvele/employee-service/internal/server"
+	"github.com/cvele/employee-service/internal/service"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
+)
 
+import (
 	_ "go.uber.org/automaxprocs"
 )
 

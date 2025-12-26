@@ -53,3 +53,4 @@ DROP INDEX IF EXISTS idx_tenant_email;
 
 COMMIT;
 
+

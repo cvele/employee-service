@@ -1,7 +1,7 @@
 package server
 
 import (
-	"employee-service/internal/data"
+	"github.com/cvele/employee-service/internal/data"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"

@@ -155,6 +155,25 @@ docker-logs:
 consumer:
 	go run cmd/consumer/main.go
 
+.PHONY: docker-build
+# build docker image
+docker-build:
+	docker build -t employee-service:latest .
+
+.PHONY: docker-build-versioned
+# build versioned docker image (requires VERSION env var)
+docker-build-versioned:
+	@if [ -z "$(VERSION)" ]; then echo "ERROR: VERSION is required. Usage: make docker-build-versioned VERSION=v1.0.0"; exit 1; fi
+	docker build -t ghcr.io/cvele/employee-service:$(VERSION) \
+	             -t ghcr.io/cvele/employee-service:latest .
+
+.PHONY: docker-push
+# push docker image to registry (requires VERSION env var)
+docker-push:
+	@if [ -z "$(VERSION)" ]; then echo "ERROR: VERSION is required. Usage: make docker-push VERSION=v1.0.0"; exit 1; fi
+	docker push ghcr.io/cvele/employee-service:$(VERSION)
+	docker push ghcr.io/cvele/employee-service:latest
+
 # show help
 help:
 	@echo ''

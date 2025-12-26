@@ -4,8 +4,8 @@ import (
 	"flag"
 	"os"
 
-	"employee-service/internal/conf"
-	"employee-service/internal/observability"
+	"github.com/cvele/employee-service/internal/conf"
+	"github.com/cvele/employee-service/internal/observability"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"

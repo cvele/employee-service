@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"employee-service/internal/biz"
+	"github.com/cvele/employee-service/internal/biz"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/middleware"

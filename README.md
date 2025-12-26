@@ -150,6 +150,98 @@ make generate
 make build
 ```
 
+## Sharing Proto Definitions with Other Projects
+
+This service exposes its event and API proto definitions as a Go module, allowing other projects to import and use the same types.
+
+### For Consumers (Other Go Projects)
+
+To use the event definitions or API types in your project:
+
+```bash
+# Install the module
+go get github.com/cvele/employee-service@v1.0.0
+
+# Or get the latest version
+go get github.com/cvele/employee-service@latest
+```
+
+Then import in your Go code:
+
+```go
+import (
+    eventsv1 "github.com/cvele/employee-service/api/events/v1"
+    employeev1 "github.com/cvele/employee-service/api/employee/v1"
+)
+
+// Use the event types
+func handleEvent(event *eventsv1.EmployeeCreatedEvent) {
+    fmt.Printf("Employee created: %s\n", event.Event.Employee.Id)
+}
+```
+
+### Available Packages
+
+- `github.com/cvele/employee-service/api/events/v1` - Employee lifecycle events (Created, Updated, Deleted, Merged)
+- `github.com/cvele/employee-service/api/employee/v1` - Employee service API definitions
+
+**Note**: Replace `cvele` with the actual GitHub organization/username where this repository is hosted.
+
+## Releases
+
+### Creating a Release
+
+Releases are automated via GitHub Actions and produce both Docker images and Go module versions.
+
+#### Steps to Create a Release:
+
+1. Go to the **Actions** tab in GitHub
+2. Select the **Release** workflow
+3. Click **Run workflow**
+4. Enter the version following semantic versioning (e.g., `v1.0.0`, `v1.2.3`)
+5. Select the branch to release from
+6. Click **Run workflow**
+
+#### What Happens During Release:
+
+1. ✅ Version format validation
+2. 🔄 Updates `Version` variable in `cmd/employee-service/main.go`
+3. 📝 Commits the version change
+4. 🏷️ Creates a Git tag
+5. 🐳 Builds Docker image with version tag
+6. 📤 Pushes to GitHub Container Registry (GHCR)
+7. 📋 Creates GitHub Release with changelog
+8. 🎯 Tags both Docker image and Go module with the same version
+
+#### Release Outputs:
+
+- **Git Tag**: `v1.0.0` (for Go modules)
+- **Docker Image**: `ghcr.io/cvele/employee-service:v1.0.0`
+- **Docker Latest**: `ghcr.io/cvele/employee-service:latest`
+- **GitHub Release**: With full changelog and usage instructions
+
+### Using Released Versions
+
+**Docker:**
+```bash
+docker pull ghcr.io/cvele/employee-service:v1.0.0
+docker run ghcr.io/cvele/employee-service:v1.0.0
+```
+
+**Go Module:**
+```bash
+go get github.com/cvele/employee-service@v1.0.0
+```
+
+### Version Management
+
+- Follow [Semantic Versioning](https://semver.org/): `vMAJOR.MINOR.PATCH`
+- **MAJOR**: Breaking changes
+- **MINOR**: New features, backwards compatible
+- **PATCH**: Bug fixes, backwards compatible
+- First production release should be `v1.0.0`
+- Development releases can use `v0.x.x`
+
 ## License
 
 See LICENSE file.

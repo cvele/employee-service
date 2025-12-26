@@ -2,7 +2,7 @@ package observability
 
 import (
 	"context"
-	"employee-service/internal/conf"
+	"github.com/cvele/employee-service/internal/conf"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"

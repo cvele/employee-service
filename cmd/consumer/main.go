@@ -1,3 +1,4 @@
+// test file only
 package main
 
 import (
@@ -7,7 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	eventsv1 "employee-service/api/events/v1"
+	eventsv1 "github.com/cvele/employee-service/api/events/v1"
 
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"

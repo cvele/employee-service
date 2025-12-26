@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"employee-service/internal/biz"
+	"github.com/cvele/employee-service/internal/biz"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"

@@ -3,7 +3,7 @@ package data
 import (
 	"time"
 
-	"employee-service/internal/biz"
+	"github.com/cvele/employee-service/internal/biz"
 
 	"github.com/google/uuid"
 )

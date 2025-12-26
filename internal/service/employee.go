@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	v1 "employee-service/api/employee/v1"
-	"employee-service/internal/biz"
+	v1 "github.com/cvele/employee-service/api/employee/v1"
+	"github.com/cvele/employee-service/internal/biz"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"

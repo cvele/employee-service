@@ -1,0 +1,140 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0, v1.2.3)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate version format
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if ! [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Version must follow semantic versioning format (e.g., v1.0.0, v1.2.3)"
+            exit 1
+          fi
+          echo "Version format is valid: $VERSION"
+
+      - name: Check if tag already exists
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "Error: Tag $VERSION already exists"
+            exit 1
+          fi
+          echo "Tag $VERSION does not exist, proceeding..."
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Update version in source code
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          echo "Updating version to $VERSION in cmd/employee-service/main.go"
+          sed -i "s/Version = \".*\"/Version = \"$VERSION\"/" cmd/employee-service/main.go
+          cat cmd/employee-service/main.go | grep "Version ="
+
+      - name: Commit version change
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add cmd/employee-service/main.go
+          git commit -m "chore: bump version to $VERSION"
+
+      - name: Create and push tag
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          git tag -a "$VERSION" -m "Release $VERSION"
+          git push origin HEAD:${{ github.ref_name }}
+          git push origin "$VERSION"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          make docker-build-versioned VERSION=$VERSION
+
+      - name: Push Docker image
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          make docker-push VERSION=$VERSION
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          
+          # Get the previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^1 2>/dev/null || echo "")
+          
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "First release - no previous tag found"
+            CHANGELOG="## 🎉 Initial Release\n\nThis is the first release of employee-service."
+          else
+            echo "Generating changelog from $PREVIOUS_TAG to $VERSION"
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..HEAD)
+            CHANGELOG="## 📝 Changes\n\n$CHANGELOG"
+          fi
+          
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: Release ${{ github.event.inputs.version }}
+          body: |
+            # Release ${{ github.event.inputs.version }}
+            
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ## 🐳 Docker Image
+            
+            ```bash
+            docker pull ghcr.io/cvele/employee-service:${{ github.event.inputs.version }}
+            ```
+            
+            ## 📦 Go Module
+            
+            ```bash
+            go get github.com/cvele/employee-service@${{ github.event.inputs.version }}
+            ```
+            
+            ## 🔗 Links
+            
+            - [Docker Image](https://github.com/cvele/employee-service/pkgs/container/employee-service)
+            - [Documentation](https://github.com/cvele/employee-service#readme)
+          draft: false
+          prerelease: false
+

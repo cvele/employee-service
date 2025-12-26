@@ -1,4 +1,4 @@
-module employee-service
+module github.com/cvele/employee-service
 
 go 1.24.0
 
@@ -60,6 +60,7 @@ require (
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/stoewer/go-strcase v1.3.1 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.29.0 // indirect
 	go.opentelemetry.io/otel/metric v1.37.0 // indirect
