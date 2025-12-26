@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package events.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "employee-service/api/events/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.events.v1";
+
+// EventType represents the type of employee lifecycle event
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  EVENT_TYPE_CREATED = 1;
+  EVENT_TYPE_UPDATED = 2;
+  EVENT_TYPE_DELETED = 3;
+  EVENT_TYPE_MERGED = 4;
+}
+
+// EmployeeEvent is the base event structure containing common metadata
+message EmployeeEvent {
+  // Unique event identifier (UUID v4)
+  string event_id = 1;
+  
+  // Type of event that occurred
+  EventType event_type = 2;
+  
+  // Tenant ID that owns this employee
+  string tenant_id = 3;
+  
+  // Timestamp when the event occurred
+  google.protobuf.Timestamp timestamp = 4;
+  
+  // User ID who triggered this event (from JWT sub claim)
+  string user_id = 5;
+  
+  // Employee data at the time of the event
+  EmployeeData employee = 6;
+  
+  // Additional metadata for the event
+  map<string, string> metadata = 7;
+}
+
+// EmployeeData contains the employee information
+message EmployeeData {
+  // Employee ID (UUID v4)
+  string id = 1;
+  
+  // Primary email address
+  string email = 2;
+  
+  // Secondary email addresses (from merges)
+  repeated string secondary_emails = 3;
+  
+  // First name
+  string first_name = 4;
+  
+  // Last name
+  string last_name = 5;
+  
+  // When the employee was created
+  google.protobuf.Timestamp created_at = 6;
+  
+  // When the employee was last updated
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// EmployeeCreatedEvent is published when a new employee is created
+message EmployeeCreatedEvent {
+  EmployeeEvent event = 1;
+}
+
+// EmployeeUpdatedEvent is published when an employee is updated
+message EmployeeUpdatedEvent {
+  EmployeeEvent event = 1;
+  
+  // List of field names that were updated (for tracking changes)
+  repeated string updated_fields = 2;
+}
+
+// EmployeeDeletedEvent is published when an employee is deleted
+message EmployeeDeletedEvent {
+  EmployeeEvent event = 1;
+}
+
+// EmployeeMergedEvent is published when two employees are merged
+message EmployeeMergedEvent {
+  EmployeeEvent event = 1;
+  
+  // The email address of the employee that was merged (became secondary)
+  string merged_from_email = 2;
+}
+

@@ -1,0 +1,52 @@
+version: '3.8'
+
+# Development-focused Docker Compose
+# Run with: docker-compose -f docker-compose.dev.yml up
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: employee-service-db-dev
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-employee_service}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      # Mount init script for development data
+      - ./scripts/init-dev-data.sql:/docker-entrypoint-initdb.d/99-init-dev-data.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - employee-network-dev
+
+  nats:
+    image: nats:latest
+    container_name: employee-service-nats
+    ports:
+      - "${NATS_PORT:-4222}:4222"  # Client connections
+      - "8222:8222"                # HTTP monitoring
+      - "6222:6222"                # Cluster routing
+    command: ["-js", "-m", "8222"]  # Enable JetStream and monitoring
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8222/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - employee-network-dev
+
+volumes:
+  postgres_dev_data:
+    driver: local
+
+networks:
+  employee-network-dev:
+    driver: bridge
+

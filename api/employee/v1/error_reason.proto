@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package employee.v1;
+
+option go_package = "employee-service/api/employee/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.employee.v1";
+
+enum ErrorReason {
+  UNKNOWN = 0;
+  EMPLOYEE_NOT_FOUND = 1;
+  EMPLOYEE_ALREADY_EXISTS = 2;
+  EMPLOYEE_NOT_IN_TENANT = 3;
+  INVALID_EMAIL = 4;
+  INVALID_EMPLOYEE_ID = 5;
+  TENANT_NOT_FOUND = 6;
+  UNAUTHORIZED = 7;
+  INVALID_UUID = 8;
+  INVALID_DATE_RANGE = 9;
+  INVALID_MERGE = 10;
+}
+

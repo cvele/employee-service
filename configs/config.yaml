@@ -1,0 +1,16 @@
+server:
+  http:
+    addr: 0.0.0.0:${HTTP_PORT:8000}
+    timeout: 1s
+  grpc:
+    addr: 0.0.0.0:${GRPC_PORT:9000}
+    timeout: 1s
+data:
+  database:
+    driver: postgres
+    source: host=${POSTGRES_HOST:localhost} user=${POSTGRES_USER:postgres} password=${POSTGRES_PASSWORD:postgres} dbname=${POSTGRES_DB:employee_service} port=${POSTGRES_PORT:5432} sslmode=${POSTGRES_SSLMODE:disable} TimeZone=UTC
+  nats:
+    url: ${NATS_URL:nats://localhost:4222}
+    # Using versioned subjects: employees.v1.{created,updated,deleted,merged}
+auth:
+  jwt_secret: ${JWT_SECRET}

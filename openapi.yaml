@@ -1,0 +1,265 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: EmployeeService API
+    description: The employee service definition.
+    version: 0.0.1
+paths:
+    /api/v1/employees:
+        get:
+            tags:
+                - EmployeeService
+            description: |-
+                Lists employees with pagination and filtering
+                 Use query parameters: ?page=1&page_size=20&email=...
+            operationId: EmployeeService_ListEmployees
+            parameters:
+                - name: page
+                  in: query
+                  description: page defaults to 1 if 0 or not set (handled in business logic)
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  description: page_size defaults to 20 if 0 or not set (handled in business logic)
+                  schema:
+                    type: integer
+                    format: int32
+                - name: createdAfter
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: createdBefore
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/employee.v1.ListEmployeesResponse'
+        post:
+            tags:
+                - EmployeeService
+            description: Creates a new employee
+            operationId: EmployeeService_CreateEmployee
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/employee.v1.CreateEmployeeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/employee.v1.CreateEmployeeResponse'
+    /api/v1/employees/merge:
+        post:
+            tags:
+                - EmployeeService
+            description: Merges two employees by email
+            operationId: EmployeeService_MergeEmployees
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/employee.v1.MergeEmployeesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/employee.v1.MergeEmployeesResponse'
+    /api/v1/employees/{id}:
+        get:
+            tags:
+                - EmployeeService
+            description: Gets an employee by ID
+            operationId: EmployeeService_GetEmployee
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/employee.v1.GetEmployeeResponse'
+        put:
+            tags:
+                - EmployeeService
+            description: Updates an existing employee
+            operationId: EmployeeService_UpdateEmployee
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/employee.v1.UpdateEmployeeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/employee.v1.UpdateEmployeeResponse'
+        delete:
+            tags:
+                - EmployeeService
+            description: Deletes an employee
+            operationId: EmployeeService_DeleteEmployee
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/employee.v1.DeleteEmployeeResponse'
+    /api/v1/employees:byEmail:
+        get:
+            tags:
+                - EmployeeService
+            description: Gets an employee by email (deprecated - use ListEmployees with email param)
+            operationId: EmployeeService_GetEmployeeByEmail
+            parameters:
+                - name: email
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/employee.v1.GetEmployeeByEmailResponse'
+components:
+    schemas:
+        employee.v1.CreateEmployeeRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+            description: Create Employee
+        employee.v1.CreateEmployeeResponse:
+            type: object
+            properties:
+                employee:
+                    $ref: '#/components/schemas/employee.v1.Employee'
+        employee.v1.DeleteEmployeeResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+        employee.v1.Employee:
+            type: object
+            properties:
+                id:
+                    type: string
+                email:
+                    type: string
+                secondaryEmails:
+                    type: array
+                    items:
+                        type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+            description: Employee message - tenant_id is NOT exposed, it's managed internally
+        employee.v1.GetEmployeeByEmailResponse:
+            type: object
+            properties:
+                employee:
+                    $ref: '#/components/schemas/employee.v1.Employee'
+        employee.v1.GetEmployeeResponse:
+            type: object
+            properties:
+                employee:
+                    $ref: '#/components/schemas/employee.v1.Employee'
+        employee.v1.ListEmployeesResponse:
+            type: object
+            properties:
+                employees:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/employee.v1.Employee'
+                total:
+                    type: string
+                page:
+                    type: integer
+                    format: int32
+                pageSize:
+                    type: integer
+                    format: int32
+        employee.v1.MergeEmployeesRequest:
+            type: object
+            properties:
+                primaryEmail:
+                    type: string
+                secondaryEmail:
+                    type: string
+            description: Merge Employees
+        employee.v1.MergeEmployeesResponse:
+            type: object
+            properties:
+                employee:
+                    $ref: '#/components/schemas/employee.v1.Employee'
+        employee.v1.UpdateEmployeeRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                email:
+                    type: string
+                    description: Optional fields - only validated if set
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+            description: Update Employee
+        employee.v1.UpdateEmployeeResponse:
+            type: object
+            properties:
+                employee:
+                    $ref: '#/components/schemas/employee.v1.Employee'
+tags:
+    - name: EmployeeService

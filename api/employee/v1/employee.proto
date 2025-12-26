@@ -1,0 +1,198 @@
+syntax = "proto3";
+
+package employee.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "employee-service/api/employee/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.employee.v1";
+option java_outer_classname = "EmployeeProtoV1";
+
+// The employee service definition.
+service EmployeeService {
+  // Creates a new employee
+  rpc CreateEmployee (CreateEmployeeRequest) returns (CreateEmployeeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/employees"
+      body: "*"
+    };
+  }
+
+  // Updates an existing employee
+  rpc UpdateEmployee (UpdateEmployeeRequest) returns (UpdateEmployeeResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/employees/{id}"
+      body: "*"
+    };
+  }
+
+  // Deletes an employee
+  rpc DeleteEmployee (DeleteEmployeeRequest) returns (DeleteEmployeeResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/employees/{id}"
+    };
+  }
+
+  // Lists employees with pagination and filtering
+  // Use query parameters: ?page=1&page_size=20&email=...
+  rpc ListEmployees (ListEmployeesRequest) returns (ListEmployeesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/employees"
+    };
+  }
+
+  // Gets an employee by ID
+  rpc GetEmployee (GetEmployeeRequest) returns (GetEmployeeResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/employees/{id}"
+    };
+  }
+
+  // Gets an employee by email (deprecated - use ListEmployees with email param)
+  rpc GetEmployeeByEmail (GetEmployeeByEmailRequest) returns (GetEmployeeByEmailResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/employees:byEmail"
+    };
+  }
+
+  // Merges two employees by email
+  rpc MergeEmployees (MergeEmployeesRequest) returns (MergeEmployeesResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/employees/merge"
+      body: "*"
+    };
+  }
+}
+
+// Employee message - tenant_id is NOT exposed, it's managed internally
+message Employee {
+  string id = 1;  // UUID v4 as string
+  string email = 2;
+  repeated string secondary_emails = 3;
+  string first_name = 4;
+  string last_name = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Create Employee
+message CreateEmployeeRequest {
+  string email = 1 [(buf.validate.field).string = {
+    email: true,
+    min_len: 3,
+    max_len: 255
+  }];
+  
+  string first_name = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100,
+    pattern: "^[a-zA-Z\\s\\-']+$"
+  }];
+  
+  string last_name = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100,
+    pattern: "^[a-zA-Z\\s\\-']+$"
+  }];
+}
+
+message CreateEmployeeResponse {
+  Employee employee = 1;
+}
+
+// Update Employee
+message UpdateEmployeeRequest {
+  string id = 1 [(buf.validate.field).string.uuid = true];
+  
+  // Optional fields - only validated if set
+  optional string email = 2 [(buf.validate.field).string = {
+    email: true,
+    min_len: 3,
+    max_len: 255
+  }];
+  
+  optional string first_name = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100,
+    pattern: "^[a-zA-Z\\s\\-']+$"
+  }];
+  
+  optional string last_name = 4 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100,
+    pattern: "^[a-zA-Z\\s\\-']+$"
+  }];
+}
+
+message UpdateEmployeeResponse {
+  Employee employee = 1;
+}
+
+// Delete Employee
+message DeleteEmployeeRequest {
+  string id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message DeleteEmployeeResponse {
+  bool success = 1;
+}
+
+// Get Employee by ID
+message GetEmployeeRequest {
+  string id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message GetEmployeeResponse {
+  Employee employee = 1;
+}
+
+// Get Employee by Email
+message GetEmployeeByEmailRequest {
+  string email = 1;
+}
+
+message GetEmployeeByEmailResponse {
+  Employee employee = 1;
+}
+
+// List Employees
+message ListEmployeesRequest {
+  // page defaults to 1 if 0 or not set (handled in business logic)
+  optional int32 page = 1 [(buf.validate.field).int32.lte = 10000];
+  
+  // page_size defaults to 20 if 0 or not set (handled in business logic)
+  optional int32 page_size = 2 [(buf.validate.field).int32.lte = 100];
+  
+  google.protobuf.Timestamp created_after = 3;
+  google.protobuf.Timestamp created_before = 4;
+}
+
+message ListEmployeesResponse {
+  repeated Employee employees = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+// Merge Employees
+message MergeEmployeesRequest {
+  string primary_email = 1 [(buf.validate.field).string = {
+    email: true,
+    min_len: 3,
+    max_len: 255
+  }];
+  
+  string secondary_email = 2 [(buf.validate.field).string = {
+    email: true,
+    min_len: 3,
+    max_len: 255
+  }];
+}
+
+message MergeEmployeesResponse {
+  Employee employee = 1;
+}
+
