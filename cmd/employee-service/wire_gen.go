@@ -24,7 +24,7 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(serverConf *conf.Server, dataConf *conf.Data, authConf *conf.Auth, obsConf *conf.Observability, serviceName observability.ServiceName, version observability.ServiceVersion, logger log.Logger) (*kratos.App, func(), error) {
+func wireApp(serverConf *conf.Server, dataConf *conf.Data, authConf *conf.Auth, obsConf *conf.Observability, environment string, serviceName observability.ServiceName, version observability.ServiceVersion, logger log.Logger) (*kratos.App, func(), error) {
 	serviceInfo := observability.NewServiceInfo(serviceName, version)
 	observabilityObservability, cleanup, err := observability.NewObservability(obsConf, serviceInfo, logger)
 	if err != nil {
@@ -41,7 +41,7 @@ func wireApp(serverConf *conf.Server, dataConf *conf.Data, authConf *conf.Auth, 
 	grpcServer := server.NewGRPCServer(serverConf, authConf, observabilityObservability, employeeService, logger)
 	healthChecker := server.ProvideHealthChecker(dataData, logger)
 	httpServer := server.NewHTTPServer(serverConf, authConf, observabilityObservability, employeeService, healthChecker, logger)
-	app := newApp(logger, grpcServer, httpServer)
+	app := newApp(logger, environment, grpcServer, httpServer)
 	return app, func() {
 		cleanup2()
 		cleanup()

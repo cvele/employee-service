@@ -24,6 +24,7 @@ func wireApp(
 	dataConf *conf.Data,
 	authConf *conf.Auth,
 	obsConf *conf.Observability,
+	environment string,
 	serviceName observability.ServiceName,
 	version observability.ServiceVersion,
 	logger log.Logger,

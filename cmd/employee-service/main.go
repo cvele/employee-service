@@ -36,13 +36,13 @@ func init() {
 }
 
 
-func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
+func newApp(logger log.Logger, environment string, gs *grpc.Server, hs *http.Server) *kratos.App {
 	return kratos.New(
 		kratos.ID(id),
 		kratos.Name(Name),
 		kratos.Version(Version),
 		kratos.Metadata(map[string]string{
-			"env": os.Getenv("ENVIRONMENT"),
+			"env": environment,
 		}),
 		kratos.Logger(logger),
 		kratos.Server(
@@ -54,15 +54,7 @@ func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 
 func main() {
 	flag.Parse()
-	logger := log.With(log.NewStdLogger(os.Stdout),
-		"ts", log.DefaultTimestamp,
-		"caller", log.DefaultCaller,
-		"service.id", id,
-		"service.name", Name,
-		"service.version", Version,
-		"trace.id", tracing.TraceID(),
-		"span.id", tracing.SpanID(),
-	)
+	
 	c := config.New(
 		config.WithSource(
 			file.NewSource(flagconf),
@@ -80,11 +72,29 @@ func main() {
 		panic(err)
 	}
 
+	// Create logger with environment context
+	logger := log.With(log.NewStdLogger(os.Stdout),
+		"ts", log.DefaultTimestamp,
+		"caller", log.DefaultCaller,
+		"service.id", id,
+		"service.name", Name,
+		"service.version", Version,
+		"service.env", bc.Environment,
+		"trace.id", tracing.TraceID(),
+		"span.id", tracing.SpanID(),
+	)
+
+	// Apply log level filter
+	if bc.Observability != nil && bc.Observability.Logging != nil && bc.Observability.Logging.Level != "" {
+		logger = log.NewFilter(logger, log.FilterLevel(parseLogLevel(bc.Observability.Logging.Level)))
+	}
+
 	app, cleanup, err := wireApp(
 		bc.Server,
 		bc.Data,
 		bc.Auth,
 		bc.Observability,
+		bc.Environment,
 		observability.ServiceName(Name),
 		observability.ServiceVersion(Version),
 		logger,
@@ -97,5 +107,21 @@ func main() {
 	// start and wait for stop signal
 	if err := app.Run(); err != nil {
 		panic(err)
+	}
+}
+
+// parseLogLevel converts string log level to log.Level
+func parseLogLevel(level string) log.Level {
+	switch level {
+	case "debug":
+		return log.LevelDebug
+	case "info":
+		return log.LevelInfo
+	case "warn":
+		return log.LevelWarn
+	case "error":
+		return log.LevelError
+	default:
+		return log.LevelInfo
 	}
 }

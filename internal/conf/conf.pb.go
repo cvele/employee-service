@@ -28,6 +28,7 @@ type Bootstrap struct {
 	Data          *Data                  `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 	Auth          *Auth                  `protobuf:"bytes,3,opt,name=auth,proto3" json:"auth,omitempty"`
 	Observability *Observability         `protobuf:"bytes,4,opt,name=observability,proto3" json:"observability,omitempty"`
+	Environment   string                 `protobuf:"bytes,5,opt,name=environment,proto3" json:"environment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -88,6 +89,13 @@ func (x *Bootstrap) GetObservability() *Observability {
 		return x.Observability
 	}
 	return nil
+}
+
+func (x *Bootstrap) GetEnvironment() string {
+	if x != nil {
+		return x.Environment
+	}
+	return ""
 }
 
 type Server struct {
@@ -431,6 +439,7 @@ type Logging struct {
 	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
 	LogRequests   bool                   `protobuf:"varint,2,opt,name=log_requests,json=logRequests,proto3" json:"log_requests,omitempty"`
 	LogResponses  bool                   `protobuf:"varint,3,opt,name=log_responses,json=logResponses,proto3" json:"log_responses,omitempty"`
+	Level         string                 `protobuf:"bytes,4,opt,name=level,proto3" json:"level,omitempty"` // debug, info, warn, error
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -484,6 +493,13 @@ func (x *Logging) GetLogResponses() bool {
 		return x.LogResponses
 	}
 	return false
+}
+
+func (x *Logging) GetLevel() string {
+	if x != nil {
+		return x.Level
+	}
+	return ""
 }
 
 type Server_HTTP struct {
@@ -707,12 +723,13 @@ var File_conf_conf_proto protoreflect.FileDescriptor
 const file_conf_conf_proto_rawDesc = "" +
 	"\n" +
 	"\x0fconf/conf.proto\x12\n" +
-	"kratos.api\x1a\x1egoogle/protobuf/duration.proto\"\xc4\x01\n" +
+	"kratos.api\x1a\x1egoogle/protobuf/duration.proto\"\xe6\x01\n" +
 	"\tBootstrap\x12*\n" +
 	"\x06server\x18\x01 \x01(\v2\x12.kratos.api.ServerR\x06server\x12$\n" +
 	"\x04data\x18\x02 \x01(\v2\x10.kratos.api.DataR\x04data\x12$\n" +
 	"\x04auth\x18\x03 \x01(\v2\x10.kratos.api.AuthR\x04auth\x12?\n" +
-	"\robservability\x18\x04 \x01(\v2\x19.kratos.api.ObservabilityR\robservability\"\xb8\x02\n" +
+	"\robservability\x18\x04 \x01(\v2\x19.kratos.api.ObservabilityR\robservability\x12 \n" +
+	"\venvironment\x18\x05 \x01(\tR\venvironment\"\xb8\x02\n" +
 	"\x06Server\x12+\n" +
 	"\x04http\x18\x01 \x01(\v2\x17.kratos.api.Server.HTTPR\x04http\x12+\n" +
 	"\x04grpc\x18\x02 \x01(\v2\x17.kratos.api.Server.GRPCR\x04grpc\x1ai\n" +
@@ -748,11 +765,12 @@ const file_conf_conf_proto_rawDesc = "" +
 	"\bendpoint\x18\x02 \x01(\tR\bendpoint\x12\x1f\n" +
 	"\vsample_rate\x18\x03 \x01(\x01R\n" +
 	"sampleRate\x12\x1a\n" +
-	"\binsecure\x18\x04 \x01(\bR\binsecure\"k\n" +
+	"\binsecure\x18\x04 \x01(\bR\binsecure\"\x81\x01\n" +
 	"\aLogging\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12!\n" +
 	"\flog_requests\x18\x02 \x01(\bR\vlogRequests\x12#\n" +
-	"\rlog_responses\x18\x03 \x01(\bR\flogResponsesB%Z#employee-service/internal/conf;confb\x06proto3"
+	"\rlog_responses\x18\x03 \x01(\bR\flogResponses\x12\x14\n" +
+	"\x05level\x18\x04 \x01(\tR\x05levelB%Z#employee-service/internal/conf;confb\x06proto3"
 
 var (
 	file_conf_conf_proto_rawDescOnce sync.Once

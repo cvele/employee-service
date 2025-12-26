@@ -1,3 +1,4 @@
+environment: ${ENVIRONMENT:development}
 server:
   http:
     addr: 0.0.0.0:${HTTP_PORT:8000}
@@ -26,5 +27,6 @@ observability:
     insecure: true
   logging:
     enabled: true
+    level: ${LOG_LEVEL:info}
     log_requests: true
     log_responses: false

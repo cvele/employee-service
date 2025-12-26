@@ -10,6 +10,7 @@ message Bootstrap {
   Data data = 2;
   Auth auth = 3;
   Observability observability = 4;
+  string environment = 5;
 }
 
 message Server {
@@ -67,4 +68,5 @@ message Logging {
   bool enabled = 1;
   bool log_requests = 2;
   bool log_responses = 3;
+  string level = 4;  // debug, info, warn, error
 }
